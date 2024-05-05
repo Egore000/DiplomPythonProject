@@ -3,11 +3,11 @@ import sys
 sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python_test\\')
 
 from Resonance import Resonance
-from Services import Tools, FileService, GraphService
+from Services import FileService, GraphService
 
 
 class Research:
-    def __init__(self, folder, file, Omega, light_effect, phi_num):
+    def __init__(self, folder, file, Omega, light_effect, phi_num=1):
         self.folder = folder
         self.file = file
         self.Omega = Omega 
@@ -26,9 +26,9 @@ class Research:
 
     def orbital_single(self):
         single = GraphService.SingleGraph({
-            'title': f'$\Phi_{self.phi_num}$',
-            'xlabel': '$\it{T}, годы$',
-            'ylabel': f'$\Phi_{self.phi_num}$, град',
+            'title': f'$\mathit{{Ф_{self.phi_num}}}$',
+            'xlabel': '$\it{T}$, годы',
+            'ylabel': f'$\mathit{{Ф_{self.phi_num}}}$, °',
             'grid': {
                 'X': {
                     'X_min': 0,
@@ -50,14 +50,14 @@ class Research:
 
     def orbital_common_phi(self):
         common = GraphService.CommonGraph({
-            'title': '$\Phi$',
+            'title': '$\mathit{Ф}$',
             'type': [None] * 5,
             'xlabel': '$\it{T}$, годы',
-            'y1label': '$\Phi_1$, град',
-            'y2label': '$\Phi_2$, град',
-            'y3label': '$\Phi_3$, град',
-            'y4label': '$\Phi_4$, град',
-            'y5label': '$\Phi_5$, град',
+            'y1label': '$\mathit{Ф_1}$, °',
+            'y2label': '$\mathit{Ф_2}$, °',
+            'y3label': '$\mathit{Ф_3}$, °',
+            'y4label': '$\mathit{Ф_4}$, °',
+            'y5label': '$\mathit{Ф_5}$, °',
             'grid': {
                 'X': {'X_min': 0, 'X_max': 100, 'Nx': 20},
                 'Y1': {'Y_min': 0, 'Y_max': 360, 'Ny': 12},
@@ -77,14 +77,14 @@ class Research:
     
     def orbital_common_dot_phi(self):
         common = GraphService.CommonGraph({
-            'title': '$\dot{\Phi}$',
+            'title': '$\dot{\mathit{Ф}}$',
             'type': [True] * 5,
             'xlabel': '$\it{T}$, годы',
-            'y1label': '$\dot{\Phi}_1$, рад/с',
-            'y2label': '$\dot{\Phi}_2$, рад/с',
-            'y3label': '$\dot{\Phi}_3$, рад/с',
-            'y4label': '$\dot{\Phi}_4$, рад/с',
-            'y5label': '$\dot{\Phi}_5$, рад/с',
+            'y1label': '$\dot{\mathit{Ф_1}}$, рад/с',
+            'y2label': '$\dot{\mathit{Ф_2}}$, рад/с',
+            'y3label': '$\dot{\mathit{Ф_3}}$, рад/с',
+            'y4label': '$\dot{\mathit{Ф_4}}$, рад/с',
+            'y5label': '$\dot{\mathit{Ф_5}}$, рад/с',
             'grid': {
                 'X': {'X_min': 0, 'X_max': 100, 'Nx': 0},
                 'Y1': {'Y_min': 0, 'Y_max': 360, 'Ny': 0},
@@ -94,6 +94,7 @@ class Research:
                 'Y5': {'Y_min': 0, 'Y_max': 360, 'Ny': 0},
             },
             'annotate': False,
+            'label_on_right': True,
         })
 
         x = [self.data['time'] for _ in range(5)]
@@ -117,7 +118,7 @@ class Research:
                     'X2': {
                         'X_min': 0,
                         'X_max': 100,
-                        'Nx': 20,
+                        'Nx': 5,
                     },
                     'Y1': {
                         'Y_min': 0,
@@ -127,29 +128,78 @@ class Research:
                     'Y2': {
                         'Y_min': 0,
                         'Y_max': 360,
-                        'Ny': 20,
+                        'Ny': 4,
                     },
                 },
                 'xlabel': '$\it{T}$, годы',
-                'y1label': f'$\dot{{\Phi_{num}}}$, рад/с',
-                'y2label': f'$\Phi_{num}$, град',
+                'y1label': f'$\dot{{\mathit{{Ф_{num}}}}}$, рад/с',
+                'y2label': f'$\mathit{{Ф_{num}}}$, °',
             })
 
             y = [
                 self.data[f'dF{num}'],
                 self.data[f'F{num}'],
             ]
-            p = pair.print(x=x, y=y).show()
+            pair.print(x=x, y=y).show()
             
+    def elements(self, elems=['i', 'ecc', 'a', 'mean_megno']):
+        x = [self.data['time']] * len(elems)
+        y = []
+        for elem in elems:
+            y.append(self.data.get(elem, []))
+
+        labels = {
+            'i': '$\mathit{i}$, °',
+            'ecc': '$\it{e}$',
+            'a': '$\mathit{a}$, км',
+            'megno': 'MEGNO',
+            'mean_megno': 'MEGNO',
+            'w': '$\mathit{\omega}$, °',
+            'Omega': '$\Omega$, °',
+            'M': '$\mathit{M}$, °',
+        }
+        y_labels = {f'y{i + 1}label': labels[elem] for i, elem in enumerate(elems)}
+
+        y_grids = {
+            f'Y{i + 1}': {
+                'Y_min': 0,
+                'Y_max': 100,
+                'Ny': 0,
+            } for i in range(len(elems) + 1)
+        }
+        grid = {
+            'X': {
+                'X_min': 0,
+                'X_max': 100,
+                'Nx': 0,
+            }, 
+        }
+        grid.update(y_grids)
+
+        params = {
+            'title': '',
+            'type': [None] * len(elems),
+            'xlabel': '$\it{T}$, годы',
+            'annotate': False,
+        }
+        params.update(y_labels)
+        params.update({'grid': grid})
+
+        common = GraphService.CommonGraph(params)
+        common.print(x=x, y=y).show()
+
+
 
 
 def main():
-    research = Research(2, 1945, 120, False, 2)
+    research = Research(2, 1945, 120, False)
+    print(research.res.path_data)
 
-    # research.orbital_single()
-    # research.orbital_common_phi()
-    # research.orbital_common_dot_phi()
+    research.orbital_single()
+    research.orbital_common_phi()
+    research.orbital_common_dot_phi()
     research.orbital_pair([1])
+    research.elements()
 
 if __name__ == "__main__":
     main()

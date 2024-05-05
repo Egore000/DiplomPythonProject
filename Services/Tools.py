@@ -18,3 +18,11 @@ def transpose(data: list[dict]) -> dict:
         outdict[key] = [d[key] for d in data]
 
     return outdict
+
+
+def batches(lst: list, size: int):
+    if size <= 0:
+       return
+    for i in range(0, len(lst), size):
+        yield lst[i : i + size]
+

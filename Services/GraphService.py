@@ -10,7 +10,6 @@ from Services import Tools
 from config import cfg, graphcfg
 
 plt.rcParams.update(graphcfg.custom_rcParams)
-# plt.style.use('seaborn-v0_8-colorblind')
 
 
 class Graph:
@@ -28,13 +27,6 @@ class Graph:
         mngr = plt.get_current_fig_manager()
         mngr.window.geometry('+0+0')
         plt.show()
-
-    @classmethod
-    def is_matrix(cls, data):
-        if hasattr(data[0], 'len'):
-            if len(data[0]) != 0:
-                return True
-        return False
     
     @classmethod
     def _annotate(cls, axes, x, y):
@@ -85,9 +77,7 @@ class Graph:
 
 
 class SingleGraph(Graph):
-    def __init__(self, params=graphcfg.custom_rcParams):
-        super().__init__(params)
-    
+
     def print(self, x, y):
         self._ax = self._fig.subplots(sharex=True)
         self._ax = super()._print_axes(self._ax, x, y)
@@ -108,9 +98,6 @@ class SingleGraph(Graph):
     
 
 class CommonGraph(SingleGraph):
-
-    def __init__(self, params=graphcfg.custom_rcParams):
-        super().__init__(params)
 
     def print(self, x, y):
         if hasattr(y[0], '__iter__'):
@@ -138,15 +125,14 @@ class CommonGraph(SingleGraph):
                 else:
                     self._grid(axes, y_key=y_key)
 
-
             axes = super()._print_axes(axes, x[i], y[i], type_[i])
             
-            if i % 2 == 1:
+            if i % 2 and len(ax) > 2:
                 axes.yaxis.tick_right()
                 axes.yaxis.labelpad = 30
-                axes.yaxis.label.set_rotation(-90)
-                axes.yaxis.set_label_position('right')
-                
+                if self.params.get('label_on_right'):
+                    axes.yaxis.label.set_rotation(-90)
+                    axes.yaxis.set_label_position('right')
         return ax
 
     def _set_params(self):
@@ -175,7 +161,7 @@ class GraphSaver:
 
 
 def main():
-    pass
+   pass
 
 
 if __name__ == "__main__":

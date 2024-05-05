@@ -3,7 +3,7 @@ import sys
 sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python_test\\')
 
 from Services import FileService, Mechanics, Tools
-from config import cfg
+from config import cfg, const
 
 
 class Resonance:
@@ -61,6 +61,8 @@ class OrbitalResonance(Resonance):
         coords = data['coords']
         velocities = data['velocities']
         date = data['date']
+        megno = data['megno']
+        mean_megno = data['mean_megno']
 
         outdata = []
         for idx, (x, v) in enumerate(zip(coords, velocities)):
@@ -82,7 +84,16 @@ class OrbitalResonance(Resonance):
                 'dF2': dot_phi[1], 
                 'dF3': dot_phi[2], 
                 'dF4': dot_phi[3], 
-                'dF5': dot_phi[4], 
+                'dF5': dot_phi[4],
+                
+                'a': a,
+                'ecc': ecc,
+                'i': i * const.toDeg,
+                'w': w * const.toDeg,
+                'Omega': Omega * const.toDeg,
+                'M': M * const.toDeg,
+                'megno': megno[idx],
+                'mean_megno': mean_megno[idx],  
             })
 
         self.data = Tools.transpose(outdata)
@@ -90,19 +101,32 @@ class OrbitalResonance(Resonance):
 
 
 class SecondaryResonance(Resonance):
-    
-    def _get_data_from_file(self) -> dict:
-        raise NotImplementedError()
 
+    def __init__(self, folder_number: int, file_number: int, Omega_value: int, sign: int,light_effect: bool = False):
+        super().__init__(folder_number, file_number, Omega_value, light_effect)
+        self._sign = 'минус' if sign < 0 else 'плюс'
+    
+    @property
+    def path_data(self):
+        return cfg.PATH_OUTDATA + self._LE + f'Omega_{self._Omega}\\Вторичные\\{self._sign}\\{self._folder}\\{str(self._file).rjust(4, "0")}.DAT'
+    
+
+    def _get_data_from_file(self) -> dict:
+        reader = FileService.SecondaryResonanceFileReader(self.path_data)
+        return reader.read()
+        
     def get_data(self):
-        raise NotImplementedError()
+        outdata = self._get_data_from_file()
+        self.data = Tools.transpose(outdata)
+        return outdata
+
 
 
 def main():
-    res = OrbitalResonance(1, 12, 120, False)
+    res = SecondaryResonance(1, 12, 120, -1, False)
     
-    res.get_data()
-    print(res.data)
+    print(res.get_data())
+    
 
 if __name__ == "__main__":
     main()
