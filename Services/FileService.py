@@ -2,7 +2,7 @@ import csv
 import os
 import sys
 
-sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python_test\\')
+sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python\\')
 
 from config import const
 from Services import Tools
@@ -97,16 +97,25 @@ class SecondaryResonanceFileReader(OrbitalResonanceFileReader):
 
 
 class FileWriter:
+    NEEDED_KEYS = '__all__'
+
     def __init__(self, path: str):
         self._path = path
 
         self.create_folder()
 
+    @classmethod
+    def _prepare_data(cls, data: list[dict]) -> list[dict]:
+        if cls.NEEDED_KEYS == '__all__':
+            return [{k: v for k, v in item.items() if k in data[0].keys()} for item in data]
+        return [{k: v for k, v in item.items() if k in cls.NEEDED_KEYS} for item in data]
+        
     def create_folder(self):
         if not os.path.exists(self._path):
             os.makedirs(self._path)
 
-    def write(self, filename: str, data: dict):
+    def write(self, filename: str, _data: dict):
+        data = self._prepare_data(_data)
         path = self._path + f'\{filename}'
         with open(path, 'w', newline='') as outfile:
             fieldnames = data[0].keys()
@@ -116,15 +125,20 @@ class FileWriter:
 
 
 class ElementsWriter(FileWriter):
-    pass
-        
+    NEEDED_KEYS = ['time', 'ecc', 'i', 'a', 'w', 'Omega', 'megno', 'M', 'mean_megno']
+     
 
 class OrbitalWriter(FileWriter):
-    pass
+    PHI_KEYS = ['F1', 'F2', 'F3', 'F4', 'F5']
+    DOT_PHI_KEYS = ['dF1', 'dF2', 'dF3', 'dF4', 'dF5']
+    NEEDED_KEYS = ['time'] + PHI_KEYS + DOT_PHI_KEYS
 
 
-class SecondaryWriter(FileWriter):
-    pass
+class SecondaryWriter(OrbitalWriter):
+    PHI_KEYS = ['F1', 'F2', 'F3', 'F4', 'F5']
+    DOT_PHI_KEYS = [f'dF{i}+' for i in range(1, 6)] \
+                + [f'dF{i}-' for i in range(1, 6)]
+    NEEDED_KEYS = ['time'] + PHI_KEYS + DOT_PHI_KEYS 
 
 
 def main():
@@ -133,9 +147,6 @@ def main():
     # print(data)
     o = OrbitalResonanceFileReader(r'C:\Users\egorp\Desktop\диплом\файлы\Выходные данные\Без светового давления\Omega_0\Орбитальные\2\2162.dat')
     data = o.read()
-
-    w = OrbitalWriter('..')
-    w.write('test.csv', data)
 
 if __name__ == "__main__":
     main()

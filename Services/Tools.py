@@ -1,4 +1,9 @@
+import sys
+sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python\\')
+
 import numpy as np
+
+from config import cfg
 
 
 def enum(x):
@@ -26,3 +31,25 @@ def batches(lst: list, size: int):
     for i in range(0, len(lst), size):
         yield lst[i : i + size]
 
+
+def create_connection_dict():
+    conn_dict = {}
+    with open(cfg.PATH_CLASSIFICATION, 'r') as data:
+        for i, line in enumerate(data):
+            if i == 0:
+                continue
+            line = line.split()
+            conn_dict[(float(line[2]), int(line[3]))] = (int(line[0]), int(line[1]))
+        
+    return conn_dict
+
+CONNECTION = create_connection_dict()
+
+
+def find_by_elements(a: float, i: int):
+    return CONNECTION.get((a, i))
+    
+
+def find_by_folder(folder: int, file: int):
+    tmpConnection = dict(zip(CONNECTION.values(), CONNECTION.keys()))
+    return tmpConnection.get((folder, file))

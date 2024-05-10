@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python_test\\')
+sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python\\')
 
 from Services import FileService, Mechanics, Tools
 from config import cfg, const
@@ -54,7 +54,7 @@ class OrbitalResonance(Resonance):
         transposed_data = Tools.transpose(data)
         return transposed_data
 
-    def get_data(self) -> dict:
+    def get_data(self) -> list[dict]:
         data = self._get_data_from_file()
 
         time = data['time']
@@ -102,14 +102,13 @@ class OrbitalResonance(Resonance):
 
 class SecondaryResonance(Resonance):
 
-    def __init__(self, folder_number: int, file_number: int, Omega_value: int, sign: int,light_effect: bool = False):
+    def __init__(self, folder_number: int, file_number: int, Omega_value: int, sign: int|str,light_effect: bool = False):
         super().__init__(folder_number, file_number, Omega_value, light_effect)
         self._sign = 'минус' if sign < 0 else 'плюс'
     
     @property
     def path_data(self):
         return cfg.PATH_OUTDATA + self._LE + f'Omega_{self._Omega}\\Вторичные\\{self._sign}\\{self._folder}\\{str(self._file).rjust(4, "0")}.DAT'
-    
 
     def _get_data_from_file(self) -> dict:
         reader = FileService.SecondaryResonanceFileReader(self.path_data)
@@ -123,10 +122,11 @@ class SecondaryResonance(Resonance):
 
 
 def main():
-    res = SecondaryResonance(1, 12, 120, -1, False)
-    
-    print(res.get_data())
-    
+    res = Mechanics.CoordsToElements(
+        [-1.32367500000000011751E+0004, -2.29267235270873358370E+0004, 0.00000000000000000000E+0000],
+        [3.36210193975105481779E+0000, -1.94111045995823467260E+0000, 0.00000000000000000000E+0000]
+    )
+    print(res[3] * const.toDeg)
 
 if __name__ == "__main__":
     main()

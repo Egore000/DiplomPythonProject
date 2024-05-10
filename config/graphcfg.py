@@ -1,8 +1,9 @@
 custom_rcParams = {
-    'figure.figsize': (11, 6),
-    'figure.subplot.hspace': 0, 
+    'figure.figsize': (12, 7),
+    'figure.subplot.hspace': 0.3,
+    'figure.subplot.wspace': 0.3, 
 
-    'font.size': 20,
+    'font.size': 18,
     'font.family': 'Times New Roman',
     
     'lines.linewidth': 0.7,

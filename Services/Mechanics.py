@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python_test\\')
+sys.path.append('C:\\Users\\egorp\\Desktop\\диплом\\файлы\\Python\\')
 
 import numpy as np
 from math import *
