@@ -270,7 +270,7 @@ def derivative_resonance(ecc: float, i: float, a: float, u: int, v: int) -> list
     F3 = u * n + v * (Omega + w - theta)
     F4 = F1 - v * Omega
     F5 = F3 + v * Omega - 2 * v * w
-    F = [F1, F2, F3, F4, F5]
+    F = np.array([F1, F2, F3, F4, F5])
     return F
 
 if __name__ == "__main__":

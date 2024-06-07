@@ -15,6 +15,9 @@ class FileReader:
     def read(self):
         raise NotImplementedError()
     
+    def read_gen(self):
+        raise NotImplementedError()
+    
 
 class EPHFileReader(FileReader):
 
@@ -37,6 +40,17 @@ class EPHFileReader(FileReader):
     @staticmethod
     def __read_megno(line: list) -> float:
         return float(line[-1])
+    
+    def __read_data(self, batch) -> dict:
+        batch = list(map(str.split, batch))
+        return {
+            'time': self.__read_time(batch[0]),
+            'date': self.__read_date(batch[0]),
+            'coords': self.__read_coords(batch[1]),
+            'megno': self.__read_megno(batch[1]),
+            'mean_megno': self.__read_megno(batch[2]),
+            'velocities': self.__read_velocities(batch[2])
+        }
 
     def read(self) -> list[dict]:
         outdata = []
@@ -45,21 +59,16 @@ class EPHFileReader(FileReader):
             dat = Tools.batches(list(data), 3)
             
             for batch in dat:
-                data_dict = {}
-                batch = list(map(str.split, batch))
-
-                data_dict['time'] = self.__read_time(batch[0])
-                data_dict['date'] = self.__read_date(batch[0])
-                
-                data_dict['coords'] = self.__read_coords(batch[1])
-                data_dict['megno'] = self.__read_megno(batch[1])
-                
-                data_dict['mean_megno'] = self.__read_megno(batch[2])
-                data_dict['velocities'] = self.__read_velocities(batch[2])
-
+                data_dict = self.__read_data(batch)
                 outdata.append(data_dict)
-        
         return outdata
+    
+    def read_gen(self):
+        with open(self._path, 'r') as data:
+            dat = Tools.batches(list(data), 3)
+            
+            for batch in dat:
+                yield self.__read_data(batch)
     
 
 class OrbitalResonanceFileReader(FileReader):
@@ -116,7 +125,7 @@ class FileWriter:
 
     def write(self, filename: str, _data: dict):
         data = self._prepare_data(_data)
-        path = self._path + f'\{filename}'
+        path = self._path + f'\\{filename}'
         with open(path, 'w', newline='') as outfile:
             fieldnames = data[0].keys()
             writer = csv.DictWriter(outfile, fieldnames=fieldnames, delimiter=';')

@@ -1,1 +1,8 @@
 __pycache__/
+test/
+.idea
+
+venv**/
+
+*.ipynb
+multisave.py

@@ -213,7 +213,7 @@ class GraphSaver:
     def save(graph: Graph, path: str, title: str):
         if not os.path.exists(path):
             os.makedirs(path)
-        graph._fig.savefig(path + f"\{title}.png", dpi=100)
+        graph._fig.savefig(path + f"\\{title}.png", dpi=100)
 
 
 def main():

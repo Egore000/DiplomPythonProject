@@ -43,9 +43,11 @@ class Research:
 
     def orbital_single(self):
         single = GraphService.SingleGraph({
-            'title': LABELS['F'].format(self.phi_num),
+            # 'title': LABELS['F'].format(self.phi_num),
+            'title': 'Либрация со смещающимся\nцентром',
             'xlabel': LABELS['t'],
-            'ylabel': LABELS['F'].format(self.phi_num),
+            # 'ylabel': LABELS['F'].format(self.phi_num),
+            'ylabel': LABELS['F'].format(' '),
             'grid': {
                 'X': {
                     'X_min': 0,
@@ -55,7 +57,7 @@ class Research:
                 'Y': {
                     'Y_min': 0,
                     'Y_max': 360,
-                    'Ny': 12,
+                    'Ny': 24,
                 }
             },
             'annotate': False,
@@ -63,7 +65,10 @@ class Research:
         single.print(
             x=self.data['time'],
             y=self.data[f'F{self.phi_num}']
-        ).show()
+        )
+        single._ax.set_ylim(0, 360)
+        single._ax.set_yticks([0, 120, 240, 360])
+        single.show()
 
     def orbital_common_phi(self):
         common = GraphService.CommonGraph({
@@ -83,7 +88,7 @@ class Research:
                 'Y4': {'Y_min': 0, 'Y_max': 360, 'Ny': 12},
                 'Y5': {'Y_min': 0, 'Y_max': 360, 'Ny': 12},
             },
-            'annotate': True,
+            'annotate': False,
         })
 
         x = [self.data['time'] for _ in range(5)]
@@ -184,7 +189,8 @@ class Research:
         grid.update(y_grids)
 
         params = {
-            'title': f'$\Omega$={self.Omega} {self.folder}/EPH_{self.file}.DAT',
+            # 'title': f'$\Omega$={self.Omega} {self.folder}/EPH_{self.file}.DAT',
+            'title': '',
             'type': [None] * (len(elems) - 1) + [None],
             'xlabel': LABELS['t'],
             'annotate': False,
@@ -284,7 +290,7 @@ class Research:
         }
         report.print(x, y)
 
-        # self.saver.save(report, '.', 'test')
+        # self.saver.save(report, './test/', f'gps_{self.file}')
         report.show()
 
     def write_to_file(self, path: str, filename: str):
@@ -293,21 +299,38 @@ class Research:
 
 
 def main():
-    research = Research(2, 3134, 0, False)
+    research = Research(2, 2317, 0, False, 1)
+    # research = Research(*Tools.find_by_elements(26532, 118), 0, False, 1)
+    
     print(research.res.path_data)
 
     # research.orbital_single()
     # research.orbital_common_phi()
     # research.orbital_common_dot_phi()
-    # research.orbital_pair([1])
+    # research.orbital_pair([3])
     # research.elements(['ecc', 'i', 'a', 'Omega'])
-    # research.elements(['w',])
-    research.report()
+    research.elements(['w',])
+    # research.report()
 
-    # print(research.find_by_folder(2, 1980))
-    # print(research.find_by_elements(26560, 108))
 
-    # research.save()
+    # research.write_to_file('../', 'data.DAT')
+    
+
+def gps_all():
+    for i in range(1, 32):
+        research = Research(1, i, 'gps', False)
+        # research.report()
+        research.write_to_file('../Классификация/Без светового давления/gps/данные/', f'gps-{i}.DAT')
+        # research.write_to_file('../', f'gps-{i}.DAT')
+
+
+def gps(number: int):
+    research = Research(1, number, 'gps', False)
+    research.elements(['i', 'Omega', 'w'])
 
 if __name__ == "__main__":
     main()
+    # print(Tools.find_by_folder(2, 2317))
+    # print(Tools.find_by_elements(26550, 118))
+    # gps_all()
+    # gps(20)

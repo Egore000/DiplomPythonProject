@@ -1,5 +1,5 @@
 custom_rcParams = {
-    'figure.figsize': (12, 7),
+    'figure.figsize': (25, 10),
     'figure.subplot.hspace': 0.3,
     'figure.subplot.wspace': 0.3, 
 
